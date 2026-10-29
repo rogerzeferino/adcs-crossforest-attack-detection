@@ -1,0 +1,34 @@
+<!--
+  Wazuh, deteccao de abuso de confianca entre florestas via FSP
+  MITRE ATT&CK, T1482, T1550.002
+  Ajuste FLORESTA_ORIGEM e os nomes de DC ao ambiente.
+  Pre-requisito, auditoria de logon (4624/4672) nos DCs.
+-->
+<group name="windows,trust,cross_forest,">
+
+  <!-- Logon de rede NTLM de conta de floresta confiavel -->
+  <rule id="100830" level="10">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4624$</field>
+    <field name="win.eventdata.logonType">^3$</field>
+    <field name="win.eventdata.authenticationPackageName">NTLM</field>
+    <field name="win.eventdata.targetDomainName">FLORESTA_ORIGEM</field>
+    <description>Logon de rede NTLM de conta de floresta confiavel no DC alvo</description>
+    <mitre>
+      <id>T1550.002</id>
+    </mitre>
+  </rule>
+
+  <!-- Privilegio especial atribuido ao logon cross-forest -->
+  <rule id="100831" level="13">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4672$</field>
+    <field name="win.eventdata.subjectDomainName">FLORESTA_ORIGEM</field>
+    <description>Privilegio administrativo atribuido a conta cross-forest, possivel abuso de FSP</description>
+    <mitre>
+      <id>T1550.002</id>
+      <id>T1482</id>
+    </mitre>
+  </rule>
+
+</group>

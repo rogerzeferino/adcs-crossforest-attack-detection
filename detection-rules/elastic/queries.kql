@@ -1,0 +1,20 @@
+# Elastic, consultas KQL para triagem rapida
+# Ajuste nomes de campo ao seu ECS mapping e as allowlists ao inventario.
+
+# ESC8, certificado emitido para conta de maquina (exclui os proprios DCs)
+event.code:"4887" and winlog.event_data.Requester:*$ and not winlog.event_data.Requester:(DC01$ or DC02$)
+
+# ESC8, coercao, acesso ao pipe efsrpc no DC
+event.code:"5145" and winlog.event_data.RelativeTargetName:"efsrpc"
+
+# DCSync, replicacao solicitada (Get-Changes-All), exclui contas de DC
+event.code:"4662" and winlog.event_data.Properties:*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2* and not winlog.event_data.SubjectUserName:(DC01$ or DC02$)
+
+# DCSync por conta de usuario (sem $), quase sempre malicioso
+event.code:"4662" and winlog.event_data.Properties:*1131f6ad-9c07-11d1-f79f-00c04fc2dcd2* and not winlog.event_data.SubjectUserName:*$
+
+# Cross-forest, logon NTLM administrativo de conta de floresta confiavel no DC alvo
+event.code:"4624" and winlog.event_data.LogonType:"3" and winlog.event_data.AuthenticationPackageName:"NTLM" and winlog.event_data.TargetDomainName:"FLORESTA_ORIGEM"
+
+# Cross-forest, privilegio especial atribuido a conta de outra floresta
+event.code:"4672" and winlog.event_data.SubjectDomainName:"FLORESTA_ORIGEM"

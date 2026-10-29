@@ -1,0 +1,41 @@
+<!--
+  Wazuh, deteccao de DCSync (replicacao de diretorio indevida)
+  MITRE ATT&CK, T1003.006
+  Pre-requisito, auditoria Directory Service Access nos DCs e SACL
+  de replicacao no objeto do dominio (gera 4662 para os GUIDs abaixo).
+-->
+<group name="windows,dcsync,">
+
+  <!-- 4662, acesso a DS-Replication-Get-Changes-All -->
+  <rule id="100820" level="12">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties">1131f6ad-9c07-11d1-f79f-00c04fc2dcd2</field>
+    <description>Replicacao de diretorio solicitada (Get-Changes-All), possivel DCSync</description>
+    <mitre>
+      <id>T1003.006</id>
+    </mitre>
+  </rule>
+
+  <!-- Eleva quando o solicitante nao e conta de maquina (sem $ no fim) -->
+  <rule id="100821" level="14">
+    <if_sid>100820</if_sid>
+    <field name="win.eventdata.subjectUserName">^(?!.*\$).*$</field>
+    <description>DCSync por conta de usuario (nao conta de maquina de DC), alta suspeita</description>
+    <mitre>
+      <id>T1003.006</id>
+    </mitre>
+  </rule>
+
+  <!-- Also, Get-Changes simples -->
+  <rule id="100822" level="10">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4662$</field>
+    <field name="win.eventdata.properties">1131f6aa-9c07-11d1-f79f-00c04fc2dcd2</field>
+    <description>Acesso a DS-Replication-Get-Changes, monitorar origem</description>
+    <mitre>
+      <id>T1003.006</id>
+    </mitre>
+  </rule>
+
+</group>

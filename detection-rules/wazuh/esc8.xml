@@ -1,0 +1,64 @@
+<!--
+  Wazuh, deteccao de AD CS ESC8 (NTLM Relay para Web Enrollment)
+  MITRE ATT&CK, T1649, T1557
+  IDs 100810 a 100812, ajuste a faixa ao seu ambiente.
+  Pre-requisito, auditoria da CA (AuditFilter 127) e coleta de eventos
+  4886/4887 do host da CA, e 5145 dos DCs.
+-->
+<group name="windows,adcs,esc8,">
+
+  <!-- 4886, requisicao de certificado recebida pela CA -->
+  <rule id="100809" level="5">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4886$</field>
+    <description>AD CS, requisicao de certificado recebida pela CA</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+  </rule>
+
+  <!-- 4887, certificado emitido para conta de maquina -->
+  <rule id="100810" level="10">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4887$</field>
+    <field name="win.eventdata.requester">\$$</field>
+    <description>AD CS, certificado emitido para conta de maquina (possivel ESC8)</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+  </rule>
+
+  <!-- 5145, acesso ao pipe efsrpc no DC, indicio de coercao MS-EFSR -->
+  <rule id="100811" level="8">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^5145$</field>
+    <field name="win.eventdata.relativeTargetName">efsrpc</field>
+    <description>Acesso ao named pipe efsrpc no DC, possivel coercao MS-EFSR</description>
+    <mitre>
+      <id>T1557</id>
+    </mitre>
+  </rule>
+
+  <!-- Correlacao, coercao e emissao em janela curta -->
+  <rule id="100812" level="13" frequency="2" timeframe="120">
+    <if_matched_group>adcs</if_matched_group>
+    <description>Cadeia ESC8 provavel, coercao e emissao de certificado correlacionadas</description>
+    <mitre>
+      <id>T1649</id>
+      <id>T1557</id>
+    </mitre>
+  </rule>
+
+  <!-- PKINIT, TGT emitido com certificado para conta de maquina -->
+  <rule id="100813" level="10">
+    <if_group>windows</if_group>
+    <field name="win.system.eventID">^4768$</field>
+    <field name="win.eventdata.targetUserName">\$$</field>
+    <field name="win.eventdata.certificateThumbprint">\.+</field>
+    <description>PKINIT, TGT emitido via certificado para conta de maquina (uso de cert ESC8)</description>
+    <mitre>
+      <id>T1649</id>
+    </mitre>
+  </rule>
+
+</group>

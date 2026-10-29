@@ -1,0 +1,16 @@
+// Elastic, deteccao de AD CS ESC8
+// MITRE ATT&CK, T1649, T1557
+// Ajuste os nomes de campo ao seu ECS mapping e as exclusoes ao inventario.
+
+// 1) Certificado emitido para conta de maquina logo apos logon de rede na CA
+sequence by winlog.computer_name with maxspan=2m
+  [ authentication where event.code == "4624" and
+      winlog.event_data.LogonType == "3" and
+      winlog.event_data.TargetUserName : "*$" ]
+  [ any where event.code == "4887" and
+      winlog.event_data.Requester : "*$" ]
+
+// 2) PKINIT, TGT emitido com certificado para conta de maquina (uso do cert)
+authentication where event.code == "4768" and
+  winlog.event_data.TargetUserName : "*$" and
+  winlog.event_data.CertificateThumbprint != null

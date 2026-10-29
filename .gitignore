@@ -1,0 +1,9 @@
+# artefatos locais de laboratorio, nunca versionar credenciais ou saidas de exame
+*.pfx
+*.ccache
+*.kirbi
+*.ntds
+*.dit
+*secretsdump*
+*.nessus
+loot/
