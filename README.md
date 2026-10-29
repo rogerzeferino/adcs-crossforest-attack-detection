@@ -100,12 +100,6 @@ Todas as ferramentas usadas são públicas e de uso legítimo em red team e pent
 - NetExec (nxc), execução e enumeração autenticada
 - nmap e gobuster, descoberta e enumeração de superfície
 
-## Autor
-
-Roger Zeferino
-Purple Team. CRTSv2, CRTA, ISO/IEC 27001, CIS Controls v8.1
-[github.com/rogerzeferino](https://github.com/rogerzeferino)
-
 ## Aviso legal
 
 Conteúdo exclusivamente educacional e defensivo. O autor não se responsabiliza por uso indevido. Técnicas ofensivas só devem ser executadas em ambientes próprios de laboratório ou com autorização formal por escrito.
